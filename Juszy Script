@@ -1,0 +1,181 @@
+-- Juszy Script UI (Scrollable Version)
+-- Made by ChatGPT
+
+-- Create ScreenGui for Main UI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "SimpleUILibrary"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Main Frame
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 300, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -150, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = false
+MainFrame.Parent = ScreenGui
+
+-- Title Bar
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+Title.Text = "Juszy Script"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 16
+Title.Parent = MainFrame
+
+-- 🧾 Scrolling Frame for Buttons
+local ScrollFrame = Instance.new("ScrollingFrame")
+ScrollFrame.Size = UDim2.new(1, 0, 1, -30)
+ScrollFrame.Position = UDim2.new(0, 0, 0, 30)
+ScrollFrame.BackgroundTransparency = 1
+ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+ScrollFrame.ScrollBarThickness = 6
+ScrollFrame.Parent = MainFrame
+
+-- Layout
+local Layout = Instance.new("UIListLayout")
+Layout.Padding = UDim.new(0, 5)
+Layout.FillDirection = Enum.FillDirection.Vertical
+Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+Layout.VerticalAlignment = Enum.VerticalAlignment.Top
+Layout.SortOrder = Enum.SortOrder.LayoutOrder
+Layout.Parent = ScrollFrame
+
+-- Auto resize scroll
+Layout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+	ScrollFrame.CanvasSize = UDim2.new(0, 0, 0, Layout.AbsoluteContentSize.Y + 10)
+end)
+
+-- Button Creator
+local function CreateButton(text, callback)
+	local Button = Instance.new("TextButton")
+	Button.Size = UDim2.new(0.9, 0, 0, 35)
+	Button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	Button.Font = Enum.Font.Gotham
+	Button.TextSize = 14
+	Button.Text = text
+	Button.AutoButtonColor = true
+	Button.Parent = ScrollFrame
+	Button.MouseButton1Click:Connect(function()
+		pcall(callback)
+	end)
+end
+
+-- 🟢 Toggle Button
+local ToggleGui = Instance.new("ScreenGui")
+ToggleGui.Name = "ToggleableUI"
+ToggleGui.ResetOnSpawn = false
+ToggleGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Size = UDim2.new(0, 100, 0, 30)
+ToggleButton.Position = UDim2.new(0.5, -50, 0, 20)
+ToggleButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.Font = Enum.Font.Gotham
+ToggleButton.TextSize = 14
+ToggleButton.Text = "Open"
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+ToggleButton.Parent = ToggleGui
+
+-- Toggle Logic
+local uiOpen = false
+local function ToggleUI()
+	uiOpen = not uiOpen
+	MainFrame.Visible = uiOpen
+	ToggleButton.Text = uiOpen and "Close" or "Open"
+end
+ToggleButton.MouseButton1Click:Connect(ToggleUI)
+
+-- ⚙️ Buttons
+CreateButton("Destroy UI", function()
+	uiOpen = false
+	if ToggleGui and ToggleGui.Parent then
+		pcall(function() ToggleGui:Destroy() end)
+	end
+	if ScreenGui and ScreenGui.Parent then
+		pcall(function() ScreenGui:Destroy() end)
+	end
+end)
+
+CreateButton("Wyborn", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/ckw69/Wyborn/main/wyborn", true))()
+end)
+
+CreateButton("Infinite Yield", function()
+	loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+end)
+
+-- 🔥 FireTouchInterests
+CreateButton("FireTouchInterests", function()
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local hrp = character:WaitForChild("HumanoidRootPart")
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("TouchTransmitter") and v.Parent:IsA("BasePart") then
+			pcall(function()
+				firetouchinterest(hrp, v.Parent, 0)
+				task.wait()
+				firetouchinterest(hrp, v.Parent, 1)
+			end)
+		end
+	end
+	print("🔥 Fired all TouchInterest parts once!")
+end)
+
+-- ⚡ FireProximityPrompts
+CreateButton("FireProximityPrompts", function()
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("ProximityPrompt") then
+			pcall(function()
+				fireproximityprompt(v)
+			end)
+		end
+	end
+	print("⚡ Fired all ProximityPrompts successfully!")
+end)
+
+-- ⏩ RemovedFireCD
+CreateButton("RemoveProximityPromptCD", function()
+	for _, v in ipairs(workspace:GetDescendants()) do
+		if v:IsA("ProximityPrompt") then
+			v.HoldDuration = 0
+		end
+	end
+	print("✅ All ProximityPrompt cooldowns removed!")
+end)
+
+-- 🧍 RemovePlayer
+CreateButton("Remove Player", function()
+	for _, v in ipairs(game.Players:GetPlayers()) do
+		if v ~= game.Players.LocalPlayer and v.Character then
+			for _, part in ipairs(v.Character:GetDescendants()) do
+				if part:IsA("BasePart") then
+					part.Transparency = 1
+					part.CanCollide = false
+				elseif part:IsA("Decal") or part:IsA("Texture") then
+					part.Transparency = 1
+				end
+			end
+		end
+	end
+	print("👻 Other players have been hidden and made non-collidable!")
+end)
+
+-- 🐢 Turtle Spy
+CreateButton("Turtle Spy", function()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/Turtle-Brand/Turtle-Spy/main/source.lua", true))()
+end)
+
+-- 🧩 Dexplorer
+CreateButton("Dexplorer", function()
+	loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Keyless-mobile-dex-17888"))()
+end)
